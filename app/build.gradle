@@ -11,8 +11,7 @@ if (hasReleaseKeystore) {
 }
 
 // paranoid 在源码中广泛使用 @Obfuscate，debug/CI 也必须启用，否则 kapt 报 NonExistentClass
-// AndResGuard 仅在有 release keystore 时启用
-def enableAndResGuard = hasReleaseKeystore || project.hasProperty('enableExtraPlugins')
+// AndResGuard 仅在有 release keystore 时启用（buildscript 内勿引用外层 def）
 buildscript {
     repositories {
         google()
@@ -23,12 +22,21 @@ buildscript {
     }
     dependencies {
         classpath 'io.michaelrocks:paranoid-gradle-plugin:0.2.5'
-        if (enableAndResGuard) {
-            classpath 'com.tencent.mm:AndResGuard-gradle-plugin:1.2.18'
-        }
+        classpath 'com.tencent.mm:AndResGuard-gradle-plugin:1.2.18'
     }
 }
 apply plugin: 'io.michaelrocks.paranoid'
+def enableAndResGuard = hasReleaseKeystore || project.hasProperty('enableExtraPlugins')
+if (enableAndResGuard) {
+    apply plugin: 'AndResGuard'
+}
+    dependencies {
+        classpath 'io.michaelrocks:paranoid-gradle-plugin:0.2.5'
+        classpath 'com.tencent.mm:AndResGuard-gradle-plugin:1.2.18'
+    }
+}
+apply plugin: 'io.michaelrocks.paranoid'
+def enableAndResGuard = hasReleaseKeystore || project.hasProperty('enableExtraPlugins')
 if (enableAndResGuard) {
     apply plugin: 'AndResGuard'
 }
