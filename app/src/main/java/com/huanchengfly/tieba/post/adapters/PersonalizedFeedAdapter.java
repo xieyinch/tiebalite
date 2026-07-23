@@ -179,13 +179,14 @@ public class PersonalizedFeedAdapter extends MultiBaseAdapter<PersonalizedBean.T
             viewHolder.setText(R.id.forum_item_title, threadBean.getTitle());
         }
         TextView textView = viewHolder.getView(R.id.forum_item_content_text);
-        if (threadBean.getAbstractBeans().size() > 0 && "0".equals(threadBean.getAbstractBeans().get(0).getType())) {
-            if (TextUtils.isEmpty(threadBean.getAbstractBeans().get(0).getText())) {
+        List<ForumPageBean.AbstractBean> abstractBeans = threadBean.getAbstractBeans();
+        if (abstractBeans != null && abstractBeans.size() > 0 && "0".equals(abstractBeans.get(0).getType())) {
+            if (TextUtils.isEmpty(abstractBeans.get(0).getText())) {
                 textView.setText(null);
                 textView.setVisibility(View.GONE);
             } else {
                 textView.setVisibility(View.VISIBLE);
-                textView.setText(threadBean.getAbstractBeans().get(0).getText());
+                textView.setText(abstractBeans.get(0).getText());
             }
         } else {
             textView.setText(null);
@@ -195,12 +196,24 @@ public class PersonalizedFeedAdapter extends MultiBaseAdapter<PersonalizedBean.T
         if (authorBean != null) {
             viewHolder.setOnClickListener(R.id.forum_item_user_avatar, v -> NavigationHelper.toUserSpaceWithAnim(mContext, authorBean.getId(), authorBean.getPortrait(), v));
             viewHolder.setText(R.id.forum_item_user_name, authorBean.getNameShow());
-            viewHolder.setText(R.id.forum_item_user_time, String.valueOf(DateUtils.getRelativeTimeSpanString(Long.valueOf(threadBean.getLastTimeInt()) * 1000L)));
+            String lastTimeInt = threadBean.getLastTimeInt();
+            if (!TextUtils.isEmpty(lastTimeInt)) {
+                try {
+                    viewHolder.setText(R.id.forum_item_user_time, String.valueOf(DateUtils.getRelativeTimeSpanString(Long.parseLong(lastTimeInt) * 1000L)));
+                } catch (NumberFormatException e) {
+                    viewHolder.setText(R.id.forum_item_user_time, TextUtils.isEmpty(threadBean.getLastTime()) ? "" : threadBean.getLastTime());
+                }
+            } else {
+                viewHolder.setText(R.id.forum_item_user_time, TextUtils.isEmpty(threadBean.getLastTime()) ? "" : threadBean.getLastTime());
+            }
             ImageUtil.load(viewHolder.getView(R.id.forum_item_user_avatar), ImageUtil.LOAD_TYPE_AVATAR, authorBean.getPortrait());
         }
         switch (viewType) {
             case TYPE_THREAD_SINGLE_PIC:
-                if (Util.canLoadGlide(mContext) && "3".equals(threadBean.getMedia().get(0).getType())) {
+                if (Util.canLoadGlide(mContext)
+                        && threadBean.getMedia() != null
+                        && !threadBean.getMedia().isEmpty()
+                        && "3".equals(threadBean.getMedia().get(0).getType())) {
                     ImageView imageView = viewHolder.getView(R.id.forum_item_content_pic);
                     imageView.setLayoutParams(getLayoutParams((RelativeLayout.LayoutParams) imageView.getLayoutParams()));
                     setListenerForImageView(threadBean.getMedia(), imageView, 0);
@@ -209,6 +222,9 @@ public class PersonalizedFeedAdapter extends MultiBaseAdapter<PersonalizedBean.T
                 }
                 break;
             case TYPE_THREAD_MULTI_PIC:
+                if (threadBean.getMedia() == null) {
+                    break;
+                }
                 GridLayout gridLayout = viewHolder.getView(R.id.forum_item_content_pics);
                 CardView cardView = viewHolder.getView(R.id.forum_item_content_pics_card);
                 cardView.setRadius(DisplayUtil.dp2px(mContext, SharedPreferencesUtil.get(mContext, SharedPreferencesUtil.SP_SETTINGS).getInt("radius", 8)));
