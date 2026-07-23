@@ -10,24 +10,27 @@ if (hasReleaseKeystore) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
-// 可选混淆插件：仅在有 release keystore 时启用，避免 CI debug 构建依赖 jcenter 旧插件
-def enableExtraPlugins = hasReleaseKeystore || project.hasProperty('enableExtraPlugins')
-if (enableExtraPlugins) {
-    buildscript {
-        repositories {
-            google()
-            mavenCentral()
-            maven { url 'https://maven.aliyun.com/repository/public' }
-            maven { url 'https://maven.aliyun.com/repository/jcenter' }
-            maven { url 'https://jitpack.io' }
-        }
-        dependencies {
+// paranoid 在源码中广泛使用 @Obfuscate，debug/CI 也必须启用，否则 kapt 报 NonExistentClass
+// AndResGuard 仅在有 release keystore 时启用
+def enableAndResGuard = hasReleaseKeystore || project.hasProperty('enableExtraPlugins')
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url 'https://maven.aliyun.com/repository/jcenter' }
+        maven { url 'https://jitpack.io' }
+    }
+    dependencies {
+        classpath 'io.michaelrocks:paranoid-gradle-plugin:0.2.5'
+        if (enableAndResGuard) {
             classpath 'com.tencent.mm:AndResGuard-gradle-plugin:1.2.18'
-            classpath 'io.michaelrocks:paranoid-gradle-plugin:0.2.5'
         }
     }
+}
+apply plugin: 'io.michaelrocks.paranoid'
+if (enableAndResGuard) {
     apply plugin: 'AndResGuard'
-    apply plugin: 'io.michaelrocks.paranoid'
 }
 
 def applicationProperties = new Properties()
@@ -43,7 +46,7 @@ if (isPerVersion) {
     applicationVersionName = applicationVersionName + ".${applicationProperties["preReleaseName"]}-${applicationProperties["preReleaseVer"]}"
 }
 
-if (enableExtraPlugins) {
+if (enableAndResGuard) {
     andResGuard {
         mappingFile = null
         use7zip = true
@@ -187,4 +190,7 @@ dependencies {
 
     implementation 'com.jakewharton:butterknife:10.2.1'
     kapt 'com.jakewharton:butterknife-compiler:10.2.1'
+
+    // paranoid @Obfuscate 运行时注解（插件通常会注入，显式声明避免 CI 漏依赖）
+    implementation 'io.michaelrocks:paranoid-core:0.2.5'
 }
