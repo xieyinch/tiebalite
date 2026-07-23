@@ -1,9 +1,15 @@
 apply plugin: 'com.android.application'
-apply plugin: 'AndResGuard'
 apply plugin: 'io.michaelrocks.paranoid'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+def hasReleaseKeystore = keystorePropertiesFile.exists()
+if (hasReleaseKeystore) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
 
 buildscript {
     repositories {
@@ -11,16 +17,20 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.tencent.mm:AndResGuard-gradle-plugin:1.2.18'
+        if (hasReleaseKeystore) {
+            classpath 'com.tencent.mm:AndResGuard-gradle-plugin:1.2.18'
+        }
         classpath 'io.michaelrocks:paranoid-gradle-plugin:0.2.5'
     }
 }
 
-def keystoreProperties = new Properties()
-keystoreProperties.load(new FileInputStream(rootProject.file("keystore.properties")))
+if (hasReleaseKeystore) {
+    apply plugin: 'AndResGuard'
+}
+
 def applicationProperties = new Properties()
 applicationProperties.load(new FileInputStream(rootProject.file("application.properties")))
-def SHA1 = System.getenv("CIRCLE_SHA1")
+def SHA1 = System.getenv("CIRCLE_SHA1") ?: System.getenv("GITHUB_SHA")
 def applicationVersionCode = applicationProperties["versionCode"].toInteger()
 def applicationVersionName = applicationProperties["versionName"]
 def isPerVersion = applicationProperties["isPerRelease"] == "true"
@@ -31,40 +41,44 @@ if (isPerVersion) {
     applicationVersionName = applicationVersionName + ".${applicationProperties["preReleaseName"]}-${applicationProperties["preReleaseVer"]}"
 }
 
-andResGuard {
-    mappingFile = null
-    use7zip = true
-    useSign = true
-    keepRoot = false
-    mergeDuplicatedRes = true
-    whiteList = ["R.mipmap.ic_launcher",
-                 "R.mipmap.ic_launcher_foreground",
-                 "R.mipmap.ic_launcher_round",
-                 "R.drawable.ic_*",
-                 "R.color.theme_color_*",
-                 "R.id.*"]
-    compressFilePattern = ["*.png",
-                           "*.jpg",
-                           "*.jpeg",
-                           "*.gif",
-                           "*.webp",
-                           "*.kotlin_metadata",
-                           "resources.arsc"]
-    sevenzip {
-        artifact = 'com.tencent.mm:SevenZip:1.2.10'
+if (hasReleaseKeystore) {
+    andResGuard {
+        mappingFile = null
+        use7zip = true
+        useSign = true
+        keepRoot = false
+        mergeDuplicatedRes = true
+        whiteList = ["R.mipmap.ic_launcher",
+                     "R.mipmap.ic_launcher_foreground",
+                     "R.mipmap.ic_launcher_round",
+                     "R.drawable.ic_*",
+                     "R.color.theme_color_*",
+                     "R.id.*"]
+        compressFilePattern = ["*.png",
+                               "*.jpg",
+                               "*.jpeg",
+                               "*.gif",
+                               "*.webp",
+                               "*.kotlin_metadata",
+                               "resources.arsc"]
+        sevenzip {
+            artifact = 'com.tencent.mm:SevenZip:1.2.10'
+        }
+        finalApkBackupPath = "${project.rootDir}/app/release/${applicationVersionName}(${applicationVersionCode}).apk"
+        digestalg = "SHA-256"
     }
-    finalApkBackupPath = "${project.rootDir}/app/release/${applicationVersionName}(${applicationVersionCode}).apk"
-    digestalg = "SHA-256"
 }
 
 android {
-    signingConfigs {
-        release {
-            keyAlias keystoreProperties['releaseKeyAlias']
-            keyPassword keystoreProperties['releaseKeyPassword']
-            storeFile file(rootDir.getCanonicalPath() + '/' + keystoreProperties['releaseKeyStore'])
-            storePassword keystoreProperties['releaseStorePassword']
-            v2SigningEnabled true
+    if (hasReleaseKeystore) {
+        signingConfigs {
+            release {
+                keyAlias keystoreProperties['releaseKeyAlias']
+                keyPassword keystoreProperties['releaseKeyPassword']
+                storeFile file(rootDir.getCanonicalPath() + '/' + keystoreProperties['releaseKeyStore'])
+                storePassword keystoreProperties['releaseStorePassword']
+                v2SigningEnabled true
+            }
         }
     }
     compileSdkVersion 29
@@ -78,13 +92,20 @@ android {
         project.ext.set("archivesBaseName",  "${versionName}(${versionCode})".toString())
     }
     buildTypes {
+        debug {
+            minifyEnabled false
+            shrinkResources false
+            multiDexEnabled true
+        }
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             debuggable false
             jniDebuggable false
-            signingConfig signingConfigs.release
+            if (hasReleaseKeystore) {
+                signingConfig signingConfigs.release
+            }
             zipAlignEnabled true
             multiDexEnabled true
         }

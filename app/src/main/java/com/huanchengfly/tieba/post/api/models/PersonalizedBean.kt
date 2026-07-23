@@ -68,6 +68,18 @@ class PersonalizedBean {
         @SerializedName("is_ntitle")
         val isNoTitle: String? = null
 
+        @SerializedName("is_ad")
+        val isAd: String? = null
+
+        @SerializedName("is_promotional")
+        val isPromotional: String? = null
+
+        @SerializedName("thread_types")
+        val threadTypes: String? = null
+
+        @SerializedName("thread_type")
+        val threadType: String? = null
+
         @SerializedName("fid")
         val forumId: String? = null
 
@@ -77,12 +89,46 @@ class PersonalizedBean {
         @SerializedName("video_info")
         val videoInfo: VideoInfoBean? = null
 
+        @SerializedName("ad_info")
+        val adInfo: Any? = null
+
+        @SerializedName("business_info")
+        val businessInfo: Any? = null
+
+        @SerializedName("goods_info")
+        val goodsInfo: Any? = null
+
         @JsonAdapter(MediaAdapter::class)
         val media: List<MediaInfoBean>? = null
 
         @SerializedName("abstract")
         val abstractBeans: List<AbstractBean>? = null
         var threadPersonalizedBean: ThreadPersonalizedBean? = null
+
+        fun isCommercialContent(): Boolean {
+            if ("1" == isAd || "1" == isPromotional) {
+                return true
+            }
+            if (adInfo != null || businessInfo != null || goodsInfo != null) {
+                return true
+            }
+            val typeText = listOfNotNull(threadTypes, threadType)
+                .joinToString(",")
+                .lowercase()
+            if (typeText.contains("ad") || typeText.contains("promot") || typeText.contains("goods")
+                || typeText.contains("shop") || typeText.contains("mall") || typeText.contains("live")
+            ) {
+                return true
+            }
+            val titleText = title.orEmpty()
+            val abstractText = abstractBeans?.joinToString("") { it.text.orEmpty() }.orEmpty()
+            val content = "$titleText $abstractText"
+            val commercialKeywords = arrayOf(
+                "广告", "推广", "小卖部", "商城", "店铺", "拼团", "限时购",
+                "优惠券", "秒杀", "直播带货", "官方商城", "贴吧小卖部"
+            )
+            return commercialKeywords.any { content.contains(it) }
+        }
 
     }
 

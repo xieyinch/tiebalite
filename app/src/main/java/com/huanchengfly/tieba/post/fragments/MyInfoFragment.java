@@ -28,7 +28,6 @@ import com.huanchengfly.tieba.post.ui.theme.utils.ThemeUtils;
 import com.huanchengfly.tieba.post.api.interfaces.CommonCallback;
 import com.huanchengfly.tieba.post.activities.MainActivity;
 import com.huanchengfly.tieba.post.R;
-import com.huanchengfly.tieba.post.activities.WebViewActivity;
 import com.huanchengfly.tieba.post.activities.HistoryActivity;
 import com.huanchengfly.tieba.post.activities.LoginActivity;
 import com.huanchengfly.tieba.post.activities.SettingsActivity;
@@ -265,12 +264,6 @@ public class MyInfoFragment extends BaseFragment implements NavigationView.OnNav
                 return true;
             case R.id.my_info_history:
                 getAttachContext().startActivity(new Intent(getAttachContext(), HistoryActivity.class));
-                return true;
-            case R.id.my_info_service_center:
-                getAttachContext().startActivity(new Intent(getAttachContext(), WebViewActivity.class).putExtra("url", "http://tieba.baidu.com/n/apage-runtime/page/ueg_service_center"));
-                return true;
-            case R.id.menu_test:
-                //getAttachContext().startActivity(new Intent(getAttachContext(), WebViewActivity.class).putExtra("url", "https://jq.qq.com/?_wv=1027&k=5EuZWD8"));
                 return true;
             case R.id.my_info_settings:
                 getAttachContext().startActivity(new Intent(getAttachContext(), SettingsActivity.class));

@@ -3,7 +3,7 @@
     <string name="title_miui_fav">%1$s_贴吧 Lite</string>
     <string name="title_notifications">消息</string>
     <string name="title_collect">收藏</string>
-    <string name="title_explore">动态</string>
+    <string name="title_explore">进吧</string>
     <string name="title_user">我</string>
     <string name="title_search">搜索</string>
     <string name="hint_search">进吧、搜贴</string>
@@ -68,7 +68,7 @@
     <string name="tip_multi_block">使用空格分割多个词语</string>
     <string name="toast_collect_update_success">更新收藏成功</string>
     <string name="toast_collect_update_error">更新收藏失败 %1$s</string>
-    <string name="title_main">首页</string>
+    <string name="title_main">推荐</string>
     <string name="title_jump_page">跳页</string>
     <string name="tip_jump_page">当前 %1$d/%2$d 页</string>
     <string name="toast_jump_page_too_big">您输入的页码不对哦</string>
@@ -215,7 +215,7 @@
     <string name="summary_status_bar_darker_changed">更改将于打开的新页面生效</string>
     <string name="settings_night_mode">夜间模式主题</string>
     <string name="settings_forum_single">吧列表单列显示</string>
-    <string name="title_hide_explore">隐藏首页「动态」入口</string>
+    <string name="title_hide_explore">隐藏「进吧」入口</string>
     <string name="settings_show_shortcut">在贴内显示快捷进吧入口</string>
     <string name="title_clear_search_history">清除搜索记录</string>
     <string name="toast_clear_success">清除成功</string>
@@ -250,7 +250,7 @@
     <string name="settings_collect_thread_see_lz">收藏贴自动开启只看楼主</string>
     <string name="tip_collect_thread_see_lz">开启后，从收藏进入的贴子将自动切换至只看楼主</string>
     <string name="tip_collect_thread_see_lz_on">从收藏进入的贴子将自动切换至只看楼主</string>
-    <string name="toast_feed_refresh">更新了 %1$d 条动态</string>
+    <string name="toast_feed_refresh">更新了 %1$d 条推荐</string>
     <string name="button_submit_dislike">不感兴趣</string>
     <string name="title_dislike">选择不喜欢理由，优化推荐</string>
     <string name="tip_refresh">上次阅读到此处，点击刷新</string>

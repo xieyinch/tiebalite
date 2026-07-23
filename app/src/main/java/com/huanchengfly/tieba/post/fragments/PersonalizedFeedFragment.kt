@@ -118,9 +118,7 @@ class PersonalizedFeedFragment : BaseFragment(), PersonalizedFeedAdapter.OnRefre
                 personalizedBean.threadList?.forEachIndexed { index, threadBean ->
                     threadBean.threadPersonalizedBean = personalizedBean.threadPersonalized?.get(index)
                 }
-                val newThreadBeans: List<PersonalizedBean.ThreadBean> = personalizedBean.threadList?.filterNot {
-                    (it.abstractBeans?.size!! > 0 && BlockUtil.needBlock(it.abstractBeans[0].text)) || BlockUtil.needBlock(it.author?.nameShow, it.author?.id)
-                }!!
+                val newThreadBeans: List<PersonalizedBean.ThreadBean> = filterFeedThreads(personalizedBean.threadList)
                 val threadBeans: MutableList<PersonalizedBean.ThreadBean> = ArrayList(adapter!!.allData)
                 adapter!!.apply {
                     setData(personalizedBean)
@@ -165,9 +163,7 @@ class PersonalizedFeedFragment : BaseFragment(), PersonalizedFeedAdapter.OnRefre
                 personalizedBean.threadList?.forEachIndexed { index, threadBean ->
                     threadBean.threadPersonalizedBean = personalizedBean.threadPersonalized?.get(index)
                 }
-                val newThreadBeans: List<PersonalizedBean.ThreadBean> = personalizedBean.threadList?.filterNot {
-                    (it.abstractBeans?.size!! > 0 && BlockUtil.needBlock(it.abstractBeans[0].text)) || BlockUtil.needBlock(it.author?.nameShow, it.author?.id)
-                }!!
+                val newThreadBeans: List<PersonalizedBean.ThreadBean> = filterFeedThreads(personalizedBean.threadList)
                 adapter!!.apply {
                     setData(personalizedBean)
                     setLoadMoreData(newThreadBeans)
@@ -200,5 +196,19 @@ class PersonalizedFeedFragment : BaseFragment(), PersonalizedFeedAdapter.OnRefre
 
     override fun onBackPressed(): Boolean {
         return Jzvd.backPress()
+    }
+
+    private fun filterFeedThreads(threadList: List<PersonalizedBean.ThreadBean>?): List<PersonalizedBean.ThreadBean> {
+        if (threadList.isNullOrEmpty()) {
+            return emptyList()
+        }
+        return threadList.filterNot { thread ->
+            thread.isCommercialContent()
+                    || (thread.abstractBeans?.isNotEmpty() == true && BlockUtil.needBlock(thread.abstractBeans[0].text))
+                    || BlockUtil.needBlock(thread.author?.nameShow, thread.author?.id)
+                    || BlockUtil.needBlock(thread.title)
+                    || thread.tid.isNullOrEmpty()
+                    || thread.forumId.isNullOrEmpty()
+        }
     }
 }

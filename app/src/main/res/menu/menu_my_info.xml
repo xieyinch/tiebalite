@@ -15,13 +15,6 @@
         android:title="@string/my_info_theme"
         app:actionLayout="@layout/switch_item" />
     <item
-        android:id="@+id/my_info_service_center"
-        android:icon="@drawable/ic_round_help_green"
-        android:title="@string/my_info_service_center" />
-    <item android:id="@+id/menu_test"
-        android:visible="false"
-        android:title="Test" />
-    <item
         android:id="@+id/my_info_settings"
         android:icon="@drawable/ic_round_settings_grey"
         android:title="@string/my_info_settings" />

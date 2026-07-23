@@ -157,16 +157,13 @@ open class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemS
         if (hideExplore) {
             mBottomNavigationView!!.menu.removeItem(R.id.navbar_explore)
         }
-        val fragmentHome = ForumListFragment()
-        mAdapter!!.addFragment(fragmentHome)
+        // 对齐官方贴吧：推荐 | 进吧 | 消息 | 我的
+        mAdapter!!.addFragment(PersonalizedFeedFragment())
         if (!hideExplore) {
-            val personalizedFeedFragment = PersonalizedFeedFragment()
-            mAdapter!!.addFragment(personalizedFeedFragment)
+            mAdapter!!.addFragment(ForumListFragment())
         }
-        val messageFragment = MessageFragment.newInstance(MessageFragment.TYPE_REPLY_ME)
-        mAdapter!!.addFragment(messageFragment)
-        val fragmentMine = MyInfoFragment()
-        mAdapter!!.addFragment(fragmentMine)
+        mAdapter!!.addFragment(MessageFragment.newInstance(MessageFragment.TYPE_REPLY_ME))
+        mAdapter!!.addFragment(MyInfoFragment())
         mViewPager!!.isCanScroll = false
         mViewPager!!.adapter = mAdapter
         mViewPager!!.offscreenPageLimit = mAdapter!!.count
