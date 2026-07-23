@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'io.michaelrocks.paranoid'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
@@ -11,31 +10,24 @@ if (hasReleaseKeystore) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-        maven { url 'https://maven.aliyun.com/repository/public' }
-        maven { url 'https://maven.aliyun.com/repository/jcenter' }
-        maven { url 'https://jitpack.io' }
-    }
-    dependencies {
-        if (hasReleaseKeystore) {
-            classpath 'com.tencent.mm:AndResGuard-gradle-plugin:1.2.18'
+// 可选混淆插件：仅在有 release keystore 时启用，避免 CI debug 构建依赖 jcenter 旧插件
+def enableExtraPlugins = hasReleaseKeystore || project.hasProperty('enableExtraPlugins')
+if (enableExtraPlugins) {
+    buildscript {
+        repositories {
+            google()
+            mavenCentral()
+            maven { url 'https://maven.aliyun.com/repository/public' }
+            maven { url 'https://maven.aliyun.com/repository/jcenter' }
+            maven { url 'https://jitpack.io' }
         }
-        classpath 'io.michaelrocks:paranoid-gradle-plugin:0.2.5'
-    }
-}
-    dependencies {
-        if (hasReleaseKeystore) {
+        dependencies {
             classpath 'com.tencent.mm:AndResGuard-gradle-plugin:1.2.18'
+            classpath 'io.michaelrocks:paranoid-gradle-plugin:0.2.5'
         }
-        classpath 'io.michaelrocks:paranoid-gradle-plugin:0.2.5'
     }
-}
-
-if (hasReleaseKeystore) {
     apply plugin: 'AndResGuard'
+    apply plugin: 'io.michaelrocks.paranoid'
 }
 
 def applicationProperties = new Properties()
@@ -51,7 +43,7 @@ if (isPerVersion) {
     applicationVersionName = applicationVersionName + ".${applicationProperties["preReleaseName"]}-${applicationProperties["preReleaseVer"]}"
 }
 
-if (hasReleaseKeystore) {
+if (enableExtraPlugins) {
     andResGuard {
         mappingFile = null
         use7zip = true

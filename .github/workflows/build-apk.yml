@@ -9,62 +9,54 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # 预装 Android SDK / JDK 的构建环境，避免新版 sdkmanager 与老 AGP 冲突
+    container:
+      image: mingc/android-build-box:1.25.0
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17 for Android SDK tools
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Install Android SDK packages
+      - name: Prepare local.properties
         run: |
-          set -euo pipefail
-          ANDROID_HOME="$HOME/android-sdk"
-          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
-          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> "$GITHUB_ENV"
-          mkdir -p "$ANDROID_HOME/cmdline-tools"
-          cd /tmp
-          curl -fsSL -o cmdtools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip -q cmdtools.zip -d "$ANDROID_HOME/cmdline-tools"
-          rm -f cmdtools.zip
-          if [ -d "$ANDROID_HOME/cmdline-tools/cmdline-tools" ]; then
-            mv "$ANDROID_HOME/cmdline-tools/cmdline-tools" "$ANDROID_HOME/cmdline-tools/latest"
+          set -e
+          if [ -n "${ANDROID_HOME:-}" ]; then
+            echo "sdk.dir=$ANDROID_HOME" > local.properties
+          elif [ -n "${ANDROID_SDK_ROOT:-}" ]; then
+            echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+          else
+            # 常见路径兜底
+            for d in /opt/android-sdk /usr/local/android-sdk /android-sdk $HOME/Android/Sdk; do
+              if [ -d "$d" ]; then
+                echo "sdk.dir=$d" > local.properties
+                export ANDROID_HOME="$d"
+                echo "ANDROID_HOME=$d" >> "$GITHUB_ENV"
+                break
+              fi
+            done
           fi
-          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
-          yes | "$SDKMANAGER" --sdk_root="$ANDROID_HOME" --licenses >/dev/null || true
-          "$SDKMANAGER" --sdk_root="$ANDROID_HOME" \
-            "platforms;android-29" \
-            "build-tools;28.0.3" \
-            "platform-tools"
-          echo "sdk.dir=$ANDROID_HOME" > "$GITHUB_WORKSPACE/local.properties"
+          echo "==== env ===="
+          java -version || true
+          echo "ANDROID_HOME=${ANDROID_HOME:-}"
+          cat local.properties || true
+          ls -la "${ANDROID_HOME:-/opt/android-sdk}" || true
 
-      - name: Set up JDK 8 for project build
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '8'
+      - name: Install platform 29 if missing
+        run: |
+          set -e
+          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/opt/android-sdk}}"
+          if [ ! -d "$SDK/platforms/android-29" ]; then
+            yes | sdkmanager --sdk_root="$SDK" "platforms;android-29" "build-tools;28.0.3" "platform-tools" || true
+          fi
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
       - name: Build debug APK
         run: |
-          set -euo pipefail
-          java -version
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          cat local.properties
-          ./gradlew assembleDebug --no-daemon --stacktrace --info | tee build.log
-          # 失败时保留关键错误摘要
-          if [ ! -f app/build/outputs/apk/debug/*.apk ] 2>/dev/null; then
-            echo "==== ERROR SUMMARY ===="
-            grep -E "FAILED|What went wrong|Could not|error:|Exception|BUILD FAILED" build.log | tail -80 || true
-          fi
-        env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_HOME }}
+          set -e
+          export ANDROID_HOME="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/opt/android-sdk}}"
+          export ANDROID_SDK_ROOT="$ANDROID_HOME"
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
