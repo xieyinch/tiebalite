@@ -30,16 +30,6 @@ def enableAndResGuard = hasReleaseKeystore || project.hasProperty('enableExtraPl
 if (enableAndResGuard) {
     apply plugin: 'AndResGuard'
 }
-    dependencies {
-        classpath 'io.michaelrocks:paranoid-gradle-plugin:0.2.5'
-        classpath 'com.tencent.mm:AndResGuard-gradle-plugin:1.2.18'
-    }
-}
-apply plugin: 'io.michaelrocks.paranoid'
-def enableAndResGuard = hasReleaseKeystore || project.hasProperty('enableExtraPlugins')
-if (enableAndResGuard) {
-    apply plugin: 'AndResGuard'
-}
 
 def applicationProperties = new Properties()
 applicationProperties.load(new FileInputStream(rootProject.file("application.properties")))
