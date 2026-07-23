@@ -114,7 +114,7 @@ class PersonalizedBean {
             }
             val typeText = listOfNotNull(threadTypes, threadType)
                 .joinToString(",")
-                .lowercase()
+                .toLowerCase()
             if (typeText.contains("ad") || typeText.contains("promot") || typeText.contains("goods")
                 || typeText.contains("shop") || typeText.contains("mall") || typeText.contains("live")
             ) {
