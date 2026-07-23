@@ -51,7 +51,17 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build debug APK
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+        run: |
+          set -euo pipefail
+          java -version
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          cat local.properties
+          ./gradlew assembleDebug --no-daemon --stacktrace --info | tee build.log
+          # 失败时保留关键错误摘要
+          if [ ! -f app/build/outputs/apk/debug/*.apk ] 2>/dev/null; then
+            echo "==== ERROR SUMMARY ===="
+            grep -E "FAILED|What went wrong|Could not|error:|Exception|BUILD FAILED" build.log | tail -80 || true
+          fi
         env:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
           ANDROID_SDK_ROOT: ${{ env.ANDROID_HOME }}

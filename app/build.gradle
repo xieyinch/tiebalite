@@ -13,9 +13,19 @@ if (hasReleaseKeystore) {
 
 buildscript {
     repositories {
-        jcenter()
         google()
+        mavenCentral()
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url 'https://maven.aliyun.com/repository/jcenter' }
+        maven { url 'https://jitpack.io' }
     }
+    dependencies {
+        if (hasReleaseKeystore) {
+            classpath 'com.tencent.mm:AndResGuard-gradle-plugin:1.2.18'
+        }
+        classpath 'io.michaelrocks:paranoid-gradle-plugin:0.2.5'
+    }
+}
     dependencies {
         if (hasReleaseKeystore) {
             classpath 'com.tencent.mm:AndResGuard-gradle-plugin:1.2.18'
