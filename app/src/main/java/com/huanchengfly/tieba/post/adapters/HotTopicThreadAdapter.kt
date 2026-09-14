@@ -5,14 +5,13 @@ import android.text.TextUtils
 import android.text.format.DateUtils
 import android.view.View
 import com.huanchengfly.tieba.post.R
+import com.huanchengfly.tieba.post.activities.WebViewActivity
 import com.huanchengfly.tieba.post.api.models.web.HotTopicMainBean
-import com.huanchengfly.tieba.post.utils.NavigationHelper
 import com.huanchengfly.tieba.post.utils.Util
 import com.othershe.baseadapter.ViewHolder
 import com.othershe.baseadapter.base.CommonBaseAdapter
 
 class HotTopicThreadAdapter(context: Context) : CommonBaseAdapter<HotTopicMainBean.ThreadBean>(context, null, true) {
-    private val navigationHelper = NavigationHelper.newInstance(context)
     private val headerView: View = Util.inflate(context, R.layout.header_hot_topic)
 
     init {
@@ -45,7 +44,9 @@ class HotTopicThreadAdapter(context: Context) : CommonBaseAdapter<HotTopicMainBe
             val tid = threadBean.threadId ?: ""
             android.util.Log.d("HotTopicAct", "click thread tid=$tid")
             if (!TextUtils.isEmpty(tid)) {
-                navigationHelper.navigationByData(NavigationHelper.ACTION_URL, "https://tieba.baidu.com/mo/q/thread_page?kz=" + tid)
+                android.widget.Toast.makeText(mContext, "打开帖子 tid=$tid", android.widget.Toast.LENGTH_SHORT).show()
+                val url = "https://tieba.baidu.com/mo/q/thread_page?kz=$tid"
+                mContext.startActivity(WebViewActivity.newIntent(mContext, url))
             }
         }
         viewHolder.setText(R.id.item_hot_topic_thread_title, threadBean.title)
