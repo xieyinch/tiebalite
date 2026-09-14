@@ -1,7 +1,6 @@
 package com.huanchengfly.tieba.post.activities
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -37,7 +36,6 @@ class HotTopicActivity : BaseActivity() {
         topicId = intent.getStringExtra(EXTRA_TOPIC_ID) ?: ""
         topicName = intent.getStringExtra(EXTRA_TOPIC_NAME) ?: ""
         val topicDesc = intent.getStringExtra(EXTRA_TOPIC_DESC)
-        Log.d("HotTopicAct", "onCreate topicId=$topicId topicName=$topicName")
 
         toolbar = findViewById(R.id.toolbar) as Toolbar
         refreshLayout = findViewById(R.id.refresh) as SwipeRefreshLayout
@@ -69,7 +67,6 @@ class HotTopicActivity : BaseActivity() {
         }
         TiebaApi.getInstance().hotTopic(topicId, topicName).enqueue(object : Callback<HotTopicBean> {
             override fun onResponse(call: Call<HotTopicBean>, response: Response<HotTopicBean>) {
-                Log.d("HotTopicAct", "topicInfo code=${response.code()} body=${response.body()?.data}")
                 val data = response.body()?.data ?: return
                 yurenRand = data.yurenRand
                 pmyTopicExt = data.pmyTopicExt ?: ""
@@ -111,9 +108,7 @@ class HotTopicActivity : BaseActivity() {
         TiebaApi.getInstance().hotTopicThread(topicId, yurenRand, topicName, pmyTopicExt, page, PAGE_SIZE, "").enqueue(object : Callback<HotTopicThreadBean> {
             override fun onResponse(call: Call<HotTopicThreadBean>, response: Response<HotTopicThreadBean>) {
                 refreshLayout.isRefreshing = false
-                Log.d("HotTopicAct", "thread resp code=${response.code()} raw=${response.raw()?.request?.url}")
                 val body = response.body()
-                Log.d("HotTopicAct", "thread body=$body data=${body?.data} list size=${body?.data?.threadList?.size}")
                 val list = body?.data?.threadList ?: emptyList()
                 if (page <= 1) {
                     adapter.setNewData(list)
@@ -128,7 +123,6 @@ class HotTopicActivity : BaseActivity() {
 
             override fun onFailure(call: Call<HotTopicThreadBean>, t: Throwable) {
                 refreshLayout.isRefreshing = false
-                Log.e("HotTopicAct", "thread onFailure", t)
                 if (page <= 1) {
                     Toast.makeText(this@HotTopicActivity, t.message, Toast.LENGTH_SHORT).show()
                 } else {

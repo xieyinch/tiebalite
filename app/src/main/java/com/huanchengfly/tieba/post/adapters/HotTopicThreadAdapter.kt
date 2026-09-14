@@ -10,7 +10,6 @@ import com.huanchengfly.tieba.post.utils.NavigationHelper
 import com.huanchengfly.tieba.post.utils.Util
 import com.othershe.baseadapter.ViewHolder
 import com.othershe.baseadapter.base.CommonBaseAdapter
-import java.util.HashMap
 
 class HotTopicThreadAdapter(context: Context) : CommonBaseAdapter<HotTopicMainBean.ThreadBean>(context, null, true) {
     private val navigationHelper = NavigationHelper.newInstance(context)
@@ -43,9 +42,10 @@ class HotTopicThreadAdapter(context: Context) : CommonBaseAdapter<HotTopicMainBe
 
     override fun convert(viewHolder: ViewHolder, threadBean: HotTopicMainBean.ThreadBean, position: Int) {
         viewHolder.setOnClickListener(R.id.item_hot_topic_thread) {
-            val map = HashMap<String, String>()
-            map["tid"] = threadBean.threadId ?: ""
-            navigationHelper.navigationByData(NavigationHelper.ACTION_THREAD, map)
+            val tid = threadBean.threadId ?: ""
+            if (!TextUtils.isEmpty(tid)) {
+                navigationHelper.navigationByData(NavigationHelper.ACTION_URL, "https://tieba.baidu.com/mo/q/thread_page?kz=" + tid)
+            }
         }
         viewHolder.setText(R.id.item_hot_topic_thread_title, threadBean.title)
         val contentView = viewHolder.getView<android.widget.TextView>(R.id.item_hot_topic_thread_content)
