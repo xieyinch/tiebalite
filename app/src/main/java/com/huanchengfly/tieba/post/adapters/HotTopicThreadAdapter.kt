@@ -43,6 +43,7 @@ class HotTopicThreadAdapter(context: Context) : CommonBaseAdapter<HotTopicMainBe
     override fun convert(viewHolder: ViewHolder, threadBean: HotTopicMainBean.ThreadBean, position: Int) {
         viewHolder.setOnClickListener(R.id.item_hot_topic_thread) {
             val tid = threadBean.threadId ?: ""
+            android.util.Log.d("HotTopicAct", "click thread tid=$tid")
             if (!TextUtils.isEmpty(tid)) {
                 navigationHelper.navigationByData(NavigationHelper.ACTION_URL, "https://tieba.baidu.com/mo/q/thread_page?kz=" + tid)
             }
