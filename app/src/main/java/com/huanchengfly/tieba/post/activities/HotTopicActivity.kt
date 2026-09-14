@@ -37,9 +37,9 @@ class HotTopicActivity : BaseActivity() {
         topicName = intent.getStringExtra(EXTRA_TOPIC_NAME) ?: ""
         val topicDesc = intent.getStringExtra(EXTRA_TOPIC_DESC)
 
-        toolbar = findViewById<Toolbar>(R.id.toolbar)
-        refreshLayout = findViewById<SwipeRefreshLayout>(R.id.refresh)
-        recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
+        toolbar = findViewById(R.id.toolbar) as Toolbar
+        refreshLayout = findViewById(R.id.refresh) as SwipeRefreshLayout
+        recyclerView = findViewById(R.id.recycler_view) as RecyclerView
 
         setSupportActionBar(toolbar)
         supportActionBar?.apply {
