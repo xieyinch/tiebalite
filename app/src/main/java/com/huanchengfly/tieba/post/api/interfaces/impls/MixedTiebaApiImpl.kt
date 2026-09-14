@@ -9,6 +9,8 @@ import com.huanchengfly.tieba.post.api.interfaces.ITiebaApi
 import com.huanchengfly.tieba.post.api.models.*
 import com.huanchengfly.tieba.post.api.models.web.ForumBean
 import com.huanchengfly.tieba.post.api.models.web.HotMessageListBean
+import com.huanchengfly.tieba.post.api.models.web.HotTopicBean
+import com.huanchengfly.tieba.post.api.models.web.HotTopicThreadBean
 import com.huanchengfly.tieba.post.api.retrofit.RetrofitTiebaApi
 import com.huanchengfly.tieba.post.BaseApplication
 import com.huanchengfly.tieba.post.models.DislikeBean
@@ -148,6 +150,22 @@ object MixedTiebaApiImpl : ITiebaApi {
     ): Call<CommonResponse> = RetrofitTiebaApi.WEB_TIEBA_API.follow("https://tieba.baidu.com/i/?portrait=${URLEncoder.encode(portrait, "UTF-8")}&cuid=&auth=&uid=&ssid=&from=&uid=&pu=&bd_page_type=2&auth=&originid=&mo_device=1&tbs=${tbs}&action=follow&op=unfollow")
 
     override fun hotMessageList(): Call<HotMessageListBean> = RetrofitTiebaApi.WEB_TIEBA_API.hotMessageList()
+
+    override fun hotTopic(topicId: String, topicName: String): Call<HotTopicBean> =
+            RetrofitTiebaApi.WEB_TIEBA_API.hotTopic(topicId, topicName)
+
+    override fun hotTopicThread(
+            topicId: String, yurenRand: Int, topicName: String, pmyTopicExt: String, page: Int, num: Int, forumId: String
+    ): Call<HotTopicThreadBean> =
+            RetrofitTiebaApi.WEB_TIEBA_API.hotTopicThread(
+                    topicId = topicId,
+                    yurenRand = yurenRand.toString(),
+                    topicName = topicName,
+                    pmyTopicExt = pmyTopicExt,
+                    page = page,
+                    num = num,
+                    forum_id = forumId
+            )
 
     override fun myInfo(cookie: String): Call<MyInfoBean> = RetrofitTiebaApi.WEB_TIEBA_API.myInfo(cookie)
 

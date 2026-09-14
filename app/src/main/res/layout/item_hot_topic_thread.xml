@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:id="@+id/item_hot_topic_thread"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:padding="16dp">
+
+        <com.huanchengfly.tieba.post.widgets.theme.TintTextView
+            android:id="@+id/item_hot_topic_thread_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:tint="@color/default_color_text"
+            tools:text="标题" />
+
+        <com.huanchengfly.tieba.post.widgets.theme.TintTextView
+            android:id="@+id/item_hot_topic_thread_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/item_hot_topic_thread_title"
+            android:layout_marginBottom="4dp"
+            android:textSize="14sp"
+            app:tint="@color/default_color_text_secondary"
+            tools:text="内容摘要" />
+
+        <com.huanchengfly.tieba.post.widgets.theme.TintTextView
+            android:id="@+id/item_hot_topic_thread_forum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/item_hot_topic_thread_content"
+            android:textSize="12sp"
+            app:tint="@color/default_color_accent"
+            tools:text="英雄联盟吧" />
+
+        <com.huanchengfly.tieba.post.widgets.theme.TintTextView
+            android:id="@+id/item_hot_topic_thread_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/item_hot_topic_thread_content"
+            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@id/item_hot_topic_thread_forum"
+            android:gravity="end"
+            android:textSize="12sp"
+            app:tint="@color/default_color_text_secondary"
+            tools:text="3 回复 · 1 小时前" />
+    </RelativeLayout>
+
+</FrameLayout>

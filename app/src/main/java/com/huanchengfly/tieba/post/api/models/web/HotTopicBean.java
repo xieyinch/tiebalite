@@ -51,6 +51,42 @@ public class HotTopicBean extends WebBaseBean<HotTopicBean.HotTopicDataBean> {
         @SerializedName("real_discuss_num")
         private String realDiscussNum;
         private TopicInfoRetExtraBean extra;
+
+        public String getCreateTime() {
+            return createTime;
+        }
+
+        public String getDiscussNum() {
+            return discussNum;
+        }
+
+        public String getHotValue() {
+            return hotValue;
+        }
+
+        public String getTopicId() {
+            return topicId;
+        }
+
+        public String getTopicName() {
+            return topicName;
+        }
+
+        public String getTopicDesc() {
+            return topicDesc;
+        }
+
+        public String getTids() {
+            return tids;
+        }
+
+        public String getRealDiscussNum() {
+            return realDiscussNum;
+        }
+
+        public TopicInfoRetExtraBean getExtra() {
+            return extra;
+        }
     }
 
     public static class TopicInfoRetExtraBean {
@@ -62,5 +98,21 @@ public class HotTopicBean extends WebBaseBean<HotTopicBean.HotTopicDataBean> {
         private String sharePic;
         @SerializedName("topic_tid")
         private String topicTid;
+
+        public String getHeadPic() {
+            return headPic;
+        }
+
+        public String getShareTitle() {
+            return shareTitle;
+        }
+
+        public String getSharePic() {
+            return sharePic;
+        }
+
+        public String getTopicTid() {
+            return topicTid;
+        }
     }
 }
