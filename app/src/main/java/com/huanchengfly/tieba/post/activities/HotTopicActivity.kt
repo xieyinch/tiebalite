@@ -112,6 +112,7 @@ class HotTopicActivity : BaseActivity() {
                 val list = body?.data?.threadList ?: emptyList()
                 if (page <= 1) {
                     adapter.setNewData(list)
+                    Toast.makeText(this@HotTopicActivity, "加载到 ${list.size} 条帖子", Toast.LENGTH_SHORT).show()
                 } else {
                     adapter.setLoadMoreData(list)
                 }

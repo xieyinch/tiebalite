@@ -19,6 +19,10 @@ class HotTopicThreadAdapter(context: Context) : CommonBaseAdapter<HotTopicMainBe
         setLoadingView(R.layout.layout_footer_loading)
         setLoadEndView(R.layout.layout_footer_loadend)
         setLoadFailedView(R.layout.layout_footer_load_failed)
+        setOnItemClickListener { _, threadBean, _ ->
+            android.util.Log.d("HotTopicAct", "ROOT click tid=${threadBean.threadId}")
+            openThread(threadBean)
+        }
     }
 
     fun bindTopic(topicName: String?, topicDesc: String?, discussNum: String?) {
@@ -41,13 +45,8 @@ class HotTopicThreadAdapter(context: Context) : CommonBaseAdapter<HotTopicMainBe
 
     override fun convert(viewHolder: ViewHolder, threadBean: HotTopicMainBean.ThreadBean, position: Int) {
         viewHolder.setOnClickListener(R.id.item_hot_topic_thread) {
-            val tid = threadBean.threadId ?: ""
-            android.util.Log.d("HotTopicAct", "click thread tid=$tid")
-            if (!TextUtils.isEmpty(tid)) {
-                android.widget.Toast.makeText(mContext, "打开帖子 tid=$tid", android.widget.Toast.LENGTH_SHORT).show()
-                val url = "https://tieba.baidu.com/mo/q/thread_page?kz=$tid"
-                mContext.startActivity(WebViewActivity.newIntent(mContext, url))
-            }
+            android.util.Log.d("HotTopicAct", "child click thread tid=${threadBean.threadId} pos=$position")
+            openThread(threadBean)
         }
         viewHolder.setText(R.id.item_hot_topic_thread_title, threadBean.title)
         val contentView = viewHolder.getView<android.widget.TextView>(R.id.item_hot_topic_thread_content)
@@ -59,6 +58,16 @@ class HotTopicThreadAdapter(context: Context) : CommonBaseAdapter<HotTopicMainBe
         }
         viewHolder.setText(R.id.item_hot_topic_thread_forum, mContext.getString(R.string.tip_forum_name, threadBean.forumName ?: ""))
         viewHolder.setText(R.id.item_hot_topic_thread_info, buildInfo(threadBean))
+    }
+
+    private fun openThread(threadBean: HotTopicMainBean.ThreadBean) {
+        val tid = threadBean.threadId ?: ""
+        android.util.Log.d("HotTopicAct", "open thread tid=$tid")
+        android.widget.Toast.makeText(mContext, "打开帖子 tid=$tid", android.widget.Toast.LENGTH_SHORT).show()
+        if (!TextUtils.isEmpty(tid)) {
+            val url = "https://tieba.baidu.com/mo/q/thread_page?kz=$tid"
+            mContext.startActivity(WebViewActivity.newIntent(mContext, url))
+        }
     }
 
     private fun buildInfo(threadBean: HotTopicMainBean.ThreadBean): String {
