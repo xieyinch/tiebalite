@@ -58,24 +58,30 @@ class HotTopicActivity : BaseActivity() {
         refreshLayout.setOnRefreshListener { refresh() }
 
         refresh()
-        loadTopicInfo()
     }
 
-    private fun loadTopicInfo() {
+    private fun loadTopicInfo(onComplete: () -> Unit) {
         if (topicId.isEmpty()) {
+            onComplete()
             return
         }
         TiebaApi.getInstance().hotTopic(topicId, topicName).enqueue(object : Callback<HotTopicBean> {
             override fun onResponse(call: Call<HotTopicBean>, response: Response<HotTopicBean>) {
-                val data = response.body()?.data ?: return
-                yurenRand = data.yurenRand
-                pmyTopicExt = data.pmyTopicExt ?: ""
-                val info = data.topicInfo?.ret?.firstOrNull() ?: return
-                supportActionBar?.title = info.topicName ?: topicName
-                adapter.bindTopic(info.topicName ?: topicName, info.topicDesc, info.discussNum ?: info.realDiscussNum)
+                val data = response.body()?.data
+                if (data != null) {
+                    yurenRand = data.yurenRand
+                    pmyTopicExt = data.pmyTopicExt ?: ""
+                    val info = data.topicInfo?.ret?.firstOrNull()
+                    if (info != null) {
+                        supportActionBar?.title = info.topicName ?: topicName
+                        adapter.bindTopic(info.topicName ?: topicName, info.topicDesc, info.discussNum ?: info.realDiscussNum)
+                    }
+                }
+                onComplete()
             }
 
             override fun onFailure(call: Call<HotTopicBean>, t: Throwable) {
+                onComplete()
             }
         })
     }
@@ -85,7 +91,11 @@ class HotTopicActivity : BaseActivity() {
         endReached = false
         refreshLayout.isRefreshing = true
         adapter.reset()
-        requestThread()
+        // The thread endpoint needs values returned by hotTopic (yuren_rand and
+        // pmy_topic_ext). Wait for that response before issuing the first page.
+        loadTopicInfo {
+            requestThread()
+        }
     }
 
     private fun loadMore(isReload: Boolean) {
