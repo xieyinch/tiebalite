@@ -154,6 +154,11 @@ object MixedTiebaApiImpl : ITiebaApi {
     override fun hotTopic(topicId: String, topicName: String): Call<HotTopicBean> =
             RetrofitTiebaApi.WEB_TIEBA_API.hotTopic(topicId, topicName)
 
+    override fun hotTopicMain(
+            topicId: String, yurenRand: String, topicName: String, pmyTopicExt: String
+    ): Call<HotTopicMainBean> =
+            RetrofitTiebaApi.WEB_TIEBA_API.hotTopicMain(topicId, yurenRand, topicName, pmyTopicExt)
+
     override fun hotTopicThread(
             topicId: String, yurenRand: Int, topicName: String, pmyTopicExt: String, page: Int, num: Int, forumId: String
     ): Call<HotTopicThreadBean> =
