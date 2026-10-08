@@ -7,6 +7,7 @@ import com.huanchengfly.tieba.post.api.models.*
 import com.huanchengfly.tieba.post.api.models.web.ForumBean
 import com.huanchengfly.tieba.post.api.models.web.HotMessageListBean
 import com.huanchengfly.tieba.post.api.models.web.HotTopicBean
+import com.huanchengfly.tieba.post.api.models.web.HotTopicMainBean
 import com.huanchengfly.tieba.post.api.models.web.HotTopicThreadBean
 import com.huanchengfly.tieba.post.models.DislikeBean
 import com.huanchengfly.tieba.post.models.MyInfoBean
@@ -403,6 +404,13 @@ interface ITiebaApi {
             topicId: String,
             topicName: String
     ): Call<HotTopicBean>
+
+    fun hotTopicMain(
+            topicId: String,
+            yurenRand: String,
+            topicName: String,
+            pmyTopicExt: String
+    ): Call<HotTopicMainBean>
 
     /**
      * 话题下的贴子列表（web 接口）
