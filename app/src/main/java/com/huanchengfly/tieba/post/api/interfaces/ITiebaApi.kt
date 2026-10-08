@@ -409,9 +409,9 @@ interface ITiebaApi {
      * 话题下的贴子列表（web 接口）
      *
      * @param topicId 话题 ID
-     * @param yurenRand 话题详情返回的随机值
+     * @param yurenRand 可留空的随机参数
      * @param topicName 话题名称
-     * @param pmyTopicExt 话题详情返回的扩展信息
+     * @param pmyTopicExt 可留空的扩展参数
      * @param page 分页页码（从 1 开始）
      * @param num 每页贴数（默认 30）
      * @param forumId 吧 ID（默认空）
