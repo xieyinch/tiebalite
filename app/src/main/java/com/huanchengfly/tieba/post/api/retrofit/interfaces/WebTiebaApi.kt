@@ -43,7 +43,11 @@ interface WebTiebaApi {
             @Query("pmy_topic_ext") pmyTopicExt: String
     ): Call<HotTopicForumBean>
 
-    @GET("/mo/q/hotMessage/thread")
+    @Headers(
+            "Referer: https://tieba.baidu.com/",
+            "Accept: application/json, text/plain, */*"
+    )
+    @GET("/mo/q/hotMessage/thread?fr=newwise")
     fun hotTopicThread(
             @Query("topic_id") topicId: String,
             @Query("yuren_rand") yurenRand: String,

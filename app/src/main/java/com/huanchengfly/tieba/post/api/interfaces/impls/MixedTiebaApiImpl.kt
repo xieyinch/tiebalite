@@ -10,7 +10,6 @@ import com.huanchengfly.tieba.post.api.models.*
 import com.huanchengfly.tieba.post.api.models.web.ForumBean
 import com.huanchengfly.tieba.post.api.models.web.HotMessageListBean
 import com.huanchengfly.tieba.post.api.models.web.HotTopicBean
-import com.huanchengfly.tieba.post.api.models.web.HotTopicMainBean
 import com.huanchengfly.tieba.post.api.models.web.HotTopicThreadBean
 import com.huanchengfly.tieba.post.api.retrofit.RetrofitTiebaApi
 import com.huanchengfly.tieba.post.BaseApplication
@@ -155,17 +154,12 @@ object MixedTiebaApiImpl : ITiebaApi {
     override fun hotTopic(topicId: String, topicName: String): Call<HotTopicBean> =
             RetrofitTiebaApi.WEB_TIEBA_API.hotTopic(topicId, topicName)
 
-    override fun hotTopicMain(
-            topicId: String, yurenRand: String, topicName: String, pmyTopicExt: String
-    ): Call<HotTopicMainBean> =
-            RetrofitTiebaApi.WEB_TIEBA_API.hotTopicMain(topicId, yurenRand, topicName, pmyTopicExt)
-
     override fun hotTopicThread(
-            topicId: String, yurenRand: Int, topicName: String, pmyTopicExt: String, page: Int, num: Int, forumId: String
+            topicId: String, yurenRand: String, topicName: String, pmyTopicExt: String, page: Int, num: Int, forumId: String
     ): Call<HotTopicThreadBean> =
             RetrofitTiebaApi.WEB_TIEBA_API.hotTopicThread(
                     topicId = topicId,
-                    yurenRand = yurenRand.toString(),
+                    yurenRand = yurenRand,
                     topicName = topicName,
                     pmyTopicExt = pmyTopicExt,
                     page = page,

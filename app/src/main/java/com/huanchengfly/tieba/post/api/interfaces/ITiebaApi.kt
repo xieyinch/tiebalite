@@ -7,7 +7,6 @@ import com.huanchengfly.tieba.post.api.models.*
 import com.huanchengfly.tieba.post.api.models.web.ForumBean
 import com.huanchengfly.tieba.post.api.models.web.HotMessageListBean
 import com.huanchengfly.tieba.post.api.models.web.HotTopicBean
-import com.huanchengfly.tieba.post.api.models.web.HotTopicMainBean
 import com.huanchengfly.tieba.post.api.models.web.HotTopicThreadBean
 import com.huanchengfly.tieba.post.models.DislikeBean
 import com.huanchengfly.tieba.post.models.MyInfoBean
@@ -405,27 +404,21 @@ interface ITiebaApi {
             topicName: String
     ): Call<HotTopicBean>
 
-    fun hotTopicMain(
-            topicId: String,
-            yurenRand: String,
-            topicName: String,
-            pmyTopicExt: String
-    ): Call<HotTopicMainBean>
 
     /**
      * 话题下的贴子列表（web 接口）
      *
      * @param topicId 话题 ID
-     * @param yurenRand 话题详情返回的随机值
+     * @param yurenRand 可留空的随机参数
      * @param topicName 话题名称
-     * @param pmyTopicExt 话题详情返回的扩展信息
+     * @param pmyTopicExt 可留空的扩展参数
      * @param page 分页页码（从 1 开始）
      * @param num 每页贴数（默认 30）
      * @param forumId 吧 ID（默认空）
      */
     fun hotTopicThread(
             topicId: String,
-            yurenRand: Int,
+            yurenRand: String,
             topicName: String,
             pmyTopicExt: String,
             page: Int,
