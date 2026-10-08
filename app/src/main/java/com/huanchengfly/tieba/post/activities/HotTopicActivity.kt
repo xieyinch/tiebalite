@@ -87,8 +87,7 @@ class HotTopicActivity : BaseActivity() {
         endReached = false
         refreshLayout.isRefreshing = true
         adapter.reset()
-        // The thread endpoint needs values returned by hotTopic (yuren_rand and
-        // pmy_topic_ext). Wait for that response before issuing the first page.
+        // Load the topic metadata before requesting its first page.
         loadTopicInfo {
             requestThread()
         }
