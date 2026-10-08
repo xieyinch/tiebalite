@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.huanchengfly.tieba.post.widgets.theme.TintLinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <com.huanchengfly.tieba.post.widgets.theme.TintTextView
+        android:id="@+id/hot_topic_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.Bold"
+        android:textSize="20sp"
+        app:tint="@color/default_color_text"
+        tools:text="新王登基!AL决赛复仇BLG" />
+
+    <com.huanchengfly.tieba.post.widgets.theme.TintTextView
+        android:id="@+id/hot_topic_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textSize="14sp"
+        app:tint="@color/default_color_text_secondary"
+        tools:text="AL战队在LPL总决赛中以3:1击败卫冕冠军BLG" />
+
+    <com.huanchengfly.tieba.post.widgets.theme.TintTextView
+        android:id="@+id/hot_topic_discuss"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textSize="12sp"
+        app:tint="@color/default_color_text_secondary"
+        tools:text="2752350 讨论" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="12dp"
+        android:background="@color/default_color_divider" />
+
+    <com.huanchengfly.tieba.post.widgets.theme.TintTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/title_hot_topic_thread"
+        android:textAppearance="@style/TextAppearance.Bold"
+        android:textSize="@dimen/text_size_hot_title"
+        app:tint="@color/default_color_text" />
+
+</com.huanchengfly.tieba.post.widgets.theme.TintLinearLayout>

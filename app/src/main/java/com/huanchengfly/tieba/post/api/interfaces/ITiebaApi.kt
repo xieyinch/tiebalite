@@ -6,6 +6,8 @@ import com.huanchengfly.tieba.post.api.SearchThreadOrder
 import com.huanchengfly.tieba.post.api.models.*
 import com.huanchengfly.tieba.post.api.models.web.ForumBean
 import com.huanchengfly.tieba.post.api.models.web.HotMessageListBean
+import com.huanchengfly.tieba.post.api.models.web.HotTopicBean
+import com.huanchengfly.tieba.post.api.models.web.HotTopicThreadBean
 import com.huanchengfly.tieba.post.models.DislikeBean
 import com.huanchengfly.tieba.post.models.MyInfoBean
 import com.huanchengfly.tieba.post.models.PhotoInfoBean
@@ -390,6 +392,38 @@ interface ITiebaApi {
     ): Call<CommonResponse>
 
     fun hotMessageList(): Call<HotMessageListBean>
+
+    /**
+     * 话题详情（web 接口）
+     *
+     * @param topicId 话题 ID
+     * @param topicName 话题名称
+     */
+    fun hotTopic(
+            topicId: String,
+            topicName: String
+    ): Call<HotTopicBean>
+
+    /**
+     * 话题下的贴子列表（web 接口）
+     *
+     * @param topicId 话题 ID
+     * @param yurenRand 话题详情返回的随机值
+     * @param topicName 话题名称
+     * @param pmyTopicExt 话题详情返回的扩展信息
+     * @param page 分页页码（从 1 开始）
+     * @param num 每页贴数（默认 30）
+     * @param forumId 吧 ID（默认空）
+     */
+    fun hotTopicThread(
+            topicId: String,
+            yurenRand: Int,
+            topicName: String,
+            pmyTopicExt: String,
+            page: Int,
+            num: Int = 30,
+            forumId: String = ""
+    ): Call<HotTopicThreadBean>
 
     /**
      * 登录用户信息

@@ -113,16 +113,19 @@ class PersonalizedFeedFragment : BaseFragment(), PersonalizedFeedAdapter.OnRefre
             }
 
             override fun onResponse(call: Call<PersonalizedBean>, response: Response<PersonalizedBean>) {
-                val personalizedBean = response.body()!!
-                this@PersonalizedFeedFragment.personalizedBean = personalizedBean
-                personalizedBean.threadList?.forEachIndexed { index, threadBean ->
-                    threadBean.threadPersonalizedBean = personalizedBean.threadPersonalized?.get(index)
+                val personalizedBean = response.body()
+                if (personalizedBean == null) {
+                    swipeRefreshLayout.isRefreshing = false
+                    Toast.makeText(attachContext, R.string.error_unknown, Toast.LENGTH_SHORT).show()
+                    return
                 }
+                this@PersonalizedFeedFragment.personalizedBean = personalizedBean
+                bindThreadPersonalized(personalizedBean)
                 val newThreadBeans: List<PersonalizedBean.ThreadBean> = filterFeedThreads(personalizedBean.threadList)
                 val threadBeans: MutableList<PersonalizedBean.ThreadBean> = ArrayList(adapter!!.allData)
                 adapter!!.apply {
                     setData(personalizedBean)
-                    if (dataCount > 0) {
+                    if (dataCount > 0 && newThreadBeans.isNotEmpty()) {
                         refreshPosition = newThreadBeans.size - 1
                     }
                     setNewData(if (threadBeans.addAll(0, newThreadBeans)) threadBeans else newThreadBeans)
@@ -158,11 +161,14 @@ class PersonalizedFeedFragment : BaseFragment(), PersonalizedFeedAdapter.OnRefre
             }
 
             override fun onResponse(call: Call<PersonalizedBean>, response: Response<PersonalizedBean>) {
-                val personalizedBean = response.body()!!
-                this@PersonalizedFeedFragment.personalizedBean = personalizedBean
-                personalizedBean.threadList?.forEachIndexed { index, threadBean ->
-                    threadBean.threadPersonalizedBean = personalizedBean.threadPersonalized?.get(index)
+                val personalizedBean = response.body()
+                if (personalizedBean == null) {
+                    swipeRefreshLayout.isRefreshing = false
+                    adapter!!.loadFailed()
+                    return
                 }
+                this@PersonalizedFeedFragment.personalizedBean = personalizedBean
+                bindThreadPersonalized(personalizedBean)
                 val newThreadBeans: List<PersonalizedBean.ThreadBean> = filterFeedThreads(personalizedBean.threadList)
                 adapter!!.apply {
                     setData(personalizedBean)
@@ -171,6 +177,18 @@ class PersonalizedFeedFragment : BaseFragment(), PersonalizedFeedAdapter.OnRefre
                 swipeRefreshLayout.isRefreshing = false
             }
         })
+    }
+
+    private fun bindThreadPersonalized(personalizedBean: PersonalizedBean) {
+        val personalizedList = personalizedBean.threadPersonalized
+        personalizedBean.threadList?.forEach { threadBean ->
+            val tid = threadBean.tid
+            threadBean.threadPersonalizedBean = when {
+                personalizedList.isNullOrEmpty() -> null
+                !tid.isNullOrEmpty() -> personalizedList.firstOrNull { it.tid == tid }
+                else -> null
+            }
+        }
     }
 
     override fun onFragmentVisibleChange(isVisible: Boolean) {

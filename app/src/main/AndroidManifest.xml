@@ -44,6 +44,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="UnusedAttribute">
         <activity android:name=".activities.HotMessageListActivity" />
+        <activity android:name=".activities.HotTopicActivity" />
         <activity
             android:name=".activities.PhotoViewActivity"
             android:configChanges="screenSize|screenLayout|orientation|smallestScreenSize|keyboardHidden"

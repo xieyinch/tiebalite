@@ -1,6 +1,7 @@
 package com.huanchengfly.tieba.post.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.widget.TextView;
 
@@ -8,7 +9,7 @@ import androidx.core.widget.TextViewCompat;
 
 import com.huanchengfly.tieba.post.api.models.web.HotMessageListBean;
 import com.huanchengfly.tieba.post.R;
-import com.huanchengfly.tieba.post.utils.NavigationHelper;
+import com.huanchengfly.tieba.post.activities.HotTopicActivity;
 import com.huanchengfly.tieba.post.utils.Util;
 import com.othershe.baseadapter.ViewHolder;
 import com.othershe.baseadapter.base.CommonBaseAdapter;
@@ -17,8 +18,15 @@ public class HotMessageListAdapter extends CommonBaseAdapter<HotMessageListBean.
     public HotMessageListAdapter(Context context) {
         super(context, null, false);
         addHeaderView(Util.inflate(context, R.layout.header_hot_message_list));
-        NavigationHelper navigationHelper = NavigationHelper.newInstance(mContext);
-        setOnItemClickListener((viewHolder, hotMessageRetBean, position) -> navigationHelper.navigationByData(NavigationHelper.ACTION_URL, String.format("https://tieba.baidu.com/mo/q/hotMessage?topic_id=%1$s&topic_name=%2$s", hotMessageRetBean.getMulId(), hotMessageRetBean.getMulName())));
+        setOnItemClickListener((viewHolder, hotMessageRetBean, position) -> {
+            Intent intent = new Intent(mContext, HotTopicActivity.class)
+                    .putExtra(HotTopicActivity.EXTRA_TOPIC_ID, hotMessageRetBean.getMulId())
+                    .putExtra(HotTopicActivity.EXTRA_TOPIC_NAME, hotMessageRetBean.getMulName());
+            if (hotMessageRetBean.getTopicInfo() != null) {
+                intent.putExtra(HotTopicActivity.EXTRA_TOPIC_DESC, hotMessageRetBean.getTopicInfo().getTopicDesc());
+            }
+            mContext.startActivity(intent);
+        });
     }
 
     @Override

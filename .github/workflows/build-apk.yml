@@ -9,44 +9,39 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # 预装 Android SDK / JDK 的构建环境，避免新版 sdkmanager 与老 AGP 冲突
-    container:
-      image: mingc/android-build-box:1.25.0
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # 新版 cmdline-tools / sdkmanager 需要较新 JDK
+      - name: Set up JDK 17 for SDK tools
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-29 build-tools;28.0.3'
+
       - name: Prepare local.properties
         run: |
           set -e
-          if [ -n "${ANDROID_HOME:-}" ]; then
-            echo "sdk.dir=$ANDROID_HOME" > local.properties
-          elif [ -n "${ANDROID_SDK_ROOT:-}" ]; then
-            echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
-          else
-            # 常见路径兜底
-            for d in /opt/android-sdk /usr/local/android-sdk /android-sdk $HOME/Android/Sdk; do
-              if [ -d "$d" ]; then
-                echo "sdk.dir=$d" > local.properties
-                export ANDROID_HOME="$d"
-                echo "ANDROID_HOME=$d" >> "$GITHUB_ENV"
-                break
-              fi
-            done
-          fi
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
           echo "==== env ===="
-          java -version || true
-          echo "ANDROID_HOME=${ANDROID_HOME:-}"
-          cat local.properties || true
-          ls -la "${ANDROID_HOME:-/opt/android-sdk}" || true
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          cat local.properties
+          ls -la "$ANDROID_HOME" || true
+          ls -la "$ANDROID_HOME/platforms" || true
+          ls -la "$ANDROID_HOME/build-tools" || true
 
-      - name: Install platform 29 if missing
-        run: |
-          set -e
-          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/opt/android-sdk}}"
-          if [ ! -d "$SDK/platforms/android-29" ]; then
-            yes | sdkmanager --sdk_root="$SDK" "platforms;android-29" "build-tools;28.0.3" "platform-tools" || true
-          fi
+      # AGP 3.5.3 + Gradle 5.5 需要 JDK 8
+      - name: Set up JDK 8 for Gradle build
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '8'
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
@@ -54,8 +49,9 @@ jobs:
       - name: Build debug APK
         run: |
           set -e
-          export ANDROID_HOME="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/opt/android-sdk}}"
-          export ANDROID_SDK_ROOT="$ANDROID_HOME"
+          java -version
+          echo "JAVA_HOME=$JAVA_HOME"
+          echo "ANDROID_HOME=$ANDROID_HOME"
           ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK

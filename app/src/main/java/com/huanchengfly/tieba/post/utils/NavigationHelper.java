@@ -20,6 +20,7 @@ import com.huanchengfly.tieba.post.ui.theme.utils.ThemeUtils;
 import com.huanchengfly.tieba.post.activities.FloorActivity;
 import com.huanchengfly.tieba.post.activities.ForumActivity;
 import com.huanchengfly.tieba.post.R;
+import com.huanchengfly.tieba.post.activities.HotTopicActivity;
 import com.huanchengfly.tieba.post.activities.ThreadActivity;
 import com.huanchengfly.tieba.post.activities.WebViewActivity;
 import com.huanchengfly.tieba.post.activities.LoginActivity;
@@ -229,6 +230,15 @@ public final class NavigationHelper {
                     intent.putExtra("url", url);
                     startActivity(intent);
                     return true;
+                } else if (path.equalsIgnoreCase("/mo/q/hotMessage")) {
+                    String topicId = uri.getQueryParameter("topic_id");
+                    String topicName = uri.getQueryParameter("topic_name");
+                    if (topicId != null && topicName != null && !activityName.startsWith("HotTopicActivity")) {
+                        startActivity(new Intent(mContext, HotTopicActivity.class)
+                                .putExtra(HotTopicActivity.EXTRA_TOPIC_ID, topicId)
+                                .putExtra(HotTopicActivity.EXTRA_TOPIC_NAME, topicName));
+                        return true;
+                    }
                 }
             }
             if (!path.contains("android_asset")) {
