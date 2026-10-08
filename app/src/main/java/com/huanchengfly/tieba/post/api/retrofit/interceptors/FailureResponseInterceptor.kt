@@ -23,7 +23,9 @@ object FailureResponseInterceptor : Interceptor {
             contentType.charset(Charsets.UTF_8)!!
         }
 
-        val responseText = body.source().buffer.clone().readString(charset)
+        val source = body.source()
+        source.request(Long.MAX_VALUE)
+        val responseText = source.buffer.clone().readString(charset)
         val jsonObject = try {
             gson.fromJson<CommonResponse>(responseText, CommonResponse::class.java)
         } catch (exception: Exception) {
