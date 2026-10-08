@@ -70,12 +70,14 @@ jobs:
         run: |
           set -euo pipefail
           VERSION_NAME="$(sed -n 's/^versionName=//p' application.properties)"
-          if [ -z "$VERSION_NAME" ]; then
-            echo "versionName not found in application.properties" >&2
+          VERSION_CODE="$(sed -n 's/^versionCode=//p' application.properties)"
+          SHORT_SHA="${GITHUB_SHA:0:7}"
+          if [ -z "$VERSION_NAME" ] || [ -z "$VERSION_CODE" ]; then
+            echo "versionName/versionCode not found in application.properties" >&2
             exit 1
           fi
 
-          TAG="v${VERSION_NAME}-xieyinch"
+          TAG="v${VERSION_NAME}-debug.${SHORT_SHA}"
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release $TAG already exists; skipping duplicate publication."
             exit 0
@@ -88,7 +90,7 @@ jobs:
           gh release create "$TAG" app/build/outputs/apk/debug/*.apk \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
-            --title "TiebaLite $VERSION_NAME Debug (xieyinch)" \
-            --notes "Automated debug APK build from master. Version code: $(sed -n 's/^versionCode=//p' application.properties). This is a debug-signed build." \
+            --title "TiebaLite $VERSION_NAME Debug ($SHORT_SHA)" \
+            --notes "Automated debug APK build from master. Version code: $VERSION_CODE. Commit: $GITHUB_SHA. This is a debug-signed build." \
             --prerelease \
             --latest=false
