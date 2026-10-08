@@ -10,6 +10,7 @@ import com.huanchengfly.tieba.post.R
 import com.huanchengfly.tieba.post.adapters.HotTopicThreadAdapter
 import com.huanchengfly.tieba.post.api.TiebaApi
 import com.huanchengfly.tieba.post.api.models.web.HotTopicBean
+import com.huanchengfly.tieba.post.api.models.web.HotTopicMainBean
 import com.huanchengfly.tieba.post.api.models.web.HotTopicThreadBean
 import com.huanchengfly.tieba.post.components.MyLinearLayoutManager
 import com.huanchengfly.tieba.post.components.dividers.CommonDivider
@@ -120,6 +121,10 @@ class HotTopicActivity : BaseActivity() {
                 refreshLayout.isRefreshing = false
                 val body = response.body()
                 val list = body?.data?.threadList ?: emptyList()
+                if (page <= 1 && list.isEmpty()) {
+                    requestThreadFallback()
+                    return
+                }
                 if (page <= 1) {
                     adapter.setNewData(list)
                     Toast.makeText(this@HotTopicActivity, "加载到 ${list.size} 条帖子", Toast.LENGTH_SHORT).show()
@@ -135,12 +140,49 @@ class HotTopicActivity : BaseActivity() {
             override fun onFailure(call: Call<HotTopicThreadBean>, t: Throwable) {
                 refreshLayout.isRefreshing = false
                 if (page <= 1) {
-                    Toast.makeText(this@HotTopicActivity, t.message, Toast.LENGTH_SHORT).show()
+                    requestThreadFallback()
                 } else {
                     adapter.loadFailed()
                 }
             }
         })
+    }
+
+    /**
+     * The thread endpoint can reject some topics even when their detail parameters
+     * are valid. The main endpoint includes the topic's recommended threads, so
+     * use it as a first-page fallback.
+     */
+    private fun requestThreadFallback() {
+        TiebaApi.getInstance().hotTopicMain(topicId, yurenRand.toString(), topicName, pmyTopicExt)
+            .enqueue(object : Callback<HotTopicMainBean> {
+                override fun onResponse(call: Call<HotTopicMainBean>, response: Response<HotTopicMainBean>) {
+                    refreshLayout.isRefreshing = false
+                    val list = response.body()?.data?.bestInfo?.ret.orEmpty()
+                        .flatMap { it.threadList?.values.orEmpty() }
+                        .distinctBy { it.threadId }
+                    adapter.setNewData(list)
+                    endReached = true
+                    adapter.loadEnd()
+                    if (list.isNotEmpty()) {
+                        Toast.makeText(this@HotTopicActivity, "已切换备用接口，加载到 ${list.size} 条帖子", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this@HotTopicActivity, "暂时无法加载话题帖子", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<HotTopicMainBean>, t: Throwable) {
+                    refreshLayout.isRefreshing = false
+                    adapter.setNewData(emptyList())
+                    endReached = true
+                    adapter.loadEnd()
+                    Toast.makeText(
+                        this@HotTopicActivity,
+                        "帖子加载失败：${t.message ?: "未知错误"}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
     }
 
     companion object {
