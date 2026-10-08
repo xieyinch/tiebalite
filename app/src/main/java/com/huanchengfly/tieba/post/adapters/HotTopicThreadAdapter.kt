@@ -5,7 +5,8 @@ import android.text.TextUtils
 import android.text.format.DateUtils
 import android.view.View
 import com.huanchengfly.tieba.post.R
-import com.huanchengfly.tieba.post.activities.WebViewActivity
+import android.content.Intent
+import com.huanchengfly.tieba.post.activities.ThreadActivity
 import com.huanchengfly.tieba.post.api.models.web.HotTopicMainBean
 import com.huanchengfly.tieba.post.utils.Util
 import com.othershe.baseadapter.ViewHolder
@@ -61,13 +62,12 @@ class HotTopicThreadAdapter(context: Context) : CommonBaseAdapter<HotTopicMainBe
     }
 
     private fun openThread(threadBean: HotTopicMainBean.ThreadBean) {
-        val tid = threadBean.threadId ?: ""
-        android.util.Log.d("HotTopicAct", "open thread tid=$tid")
-        android.widget.Toast.makeText(mContext, "打开帖子 tid=$tid", android.widget.Toast.LENGTH_SHORT).show()
-        if (!TextUtils.isEmpty(tid)) {
-            val url = "https://tieba.baidu.com/mo/q/thread_page?kz=$tid"
-            mContext.startActivity(WebViewActivity.newIntent(mContext, url))
-        }
+        val tid = threadBean.threadId ?: return
+        if (TextUtils.isEmpty(tid)) return
+        mContext.startActivity(
+            Intent(mContext, ThreadActivity::class.java)
+                .putExtra("tid", tid)
+        )
     }
 
     private fun buildInfo(threadBean: HotTopicMainBean.ThreadBean): String {
