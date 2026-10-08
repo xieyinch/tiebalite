@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -54,9 +56,39 @@ jobs:
           echo "ANDROID_HOME=$ANDROID_HOME"
           ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: Upload APK
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: TiebaLite-debug
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+
+      - name: Publish versioned GitHub Release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          VERSION_NAME="$(sed -n 's/^versionName=//p' application.properties)"
+          if [ -z "$VERSION_NAME" ]; then
+            echo "versionName not found in application.properties" >&2
+            exit 1
+          fi
+
+          TAG="v${VERSION_NAME}-xieyinch"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; skipping duplicate publication."
+            exit 0
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG exists without a release; refusing to publish against an existing tag." >&2
+            exit 1
+          fi
+
+          gh release create "$TAG" app/build/outputs/apk/debug/*.apk \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "TiebaLite $VERSION_NAME Debug (xieyinch)" \
+            --notes "Automated debug APK build from master. Version code: $(sed -n 's/^versionCode=//p' application.properties). This is a debug-signed build." \
+            --prerelease \
+            --latest=false
